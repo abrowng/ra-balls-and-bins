@@ -10,7 +10,7 @@ class BinsPlotter:
 
     def create_plot(self, y_value=None):
         plt.figure(figsize=(10, 6))
-        plt.bar(range(len(self.bins)), self.bin_sizes)
+        plt.bar(range(len(self.bins)), self.bin_sizes, color='skyblue')
         plt.xlabel('Bins')
         plt.ylabel('Number of Balls')
         plt.title('Number of Balls in Each Bin')
@@ -18,7 +18,7 @@ class BinsPlotter:
         plt.tight_layout()
 
         if y_value is not None:
-            plt.axhline(y=y_value, color='g', linestyle='--')
+            plt.axhline(y=y_value, color='r', linestyle='-')
 
     @staticmethod
     def show_plot():
