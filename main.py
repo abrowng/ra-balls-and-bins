@@ -5,10 +5,7 @@ from plotter import BinsPlotter, GapPlotter
 from models import *
 
 TRIALS = [
-    Trial(allocation_strat=AllocationStrategy.STANDARD, balls=100, bins=100, choices=1, repetitions=100),
-    Trial(allocation_strat=AllocationStrategy.STANDARD, balls=500, bins=100, choices=1, repetitions=100),
-    Trial(allocation_strat=AllocationStrategy.STANDARD, balls=1000, bins=100, choices=1, repetitions=100),
-    Trial(allocation_strat=AllocationStrategy.STANDARD, balls=10000, bins=100, choices=1, repetitions=100),
+    Trial(allocation_strat=AllocationStrategy.B_BATCHED, balls=100, bins=100, choices=1, repetitions=10, batch_size=10),
 ]
 
 if __name__ == "__main__":
@@ -25,22 +22,38 @@ if __name__ == "__main__":
             bins = [Bin(f"Bin {i+1}") for i in range(trial.bins)]
             allocator = Allocator(bins, trial.balls, trial.choices)
 
-            allocator.run(allocation_strategy=trial.allocation_strat, d=trial.choices)
+            allocator.run(
+                allocation_strategy=trial.allocation_strat,
+                d=trial.choices,
+                beta=trial.beta,
+                batch_size=trial.batch_size,
+            )
+
+            if j == 0:
+                for batch in allocator.batch_initial_state:
+                    plotter = BinsPlotter(batch)
+                    plotter.create_plot(y_value=trial.balls / trial.bins, title="Initial State before batch allocation")
+                    plotter.show_plot()
+                for batch in allocator.batch_outputs:
+                    plotter = BinsPlotter(batch)
+                    plotter.create_plot(y_value=trial.balls / trial.bins, title="Final State after batch allocation")
+                    plotter.show_plot()
 
             calc = GapCalculator(bins, trial.bins, trial.balls)
             gaps = np.append(gaps, calc.gap())
             all_bins = np.append(all_bins, [b.size() for b in bins])
 
-            if j == 0:
-                plotter = BinsPlotter(bins)
-                plotter.create_plot(y_value=trial.balls / trial.bins)
-                plotter.show_plot()
-
         gaps_plotter = GapPlotter(gaps)
         gaps_plotter.plot_results()
         gaps_plotter.show_plot()
         print(
-            f"Mean gap for test {i+1} (Allocation: {trial.allocation_strat}, "
-            f"Balls: {trial.balls}, Bins: {trial.bins}): {np.mean(gaps)}"
+            f"Test {i+1} (Allocation: {trial.allocation_strat.value}, n: {trial.balls}, "
+            f"m: {trial.bins}, d: {trial.choices}, T: {t_repetitions}: "
         )
+        print(
+            f"\tMean Gap: {np.mean(gaps)}\n"
+            f"\tStandard Deviation: {np.std(gaps)}\n"
+            f"\tVariance: {np.var(gaps)}\n"
+        )
+
 
