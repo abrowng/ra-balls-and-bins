@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections import namedtuple
 from enum import Enum
 
-FIELDS = ["allocation_strat", "balls", "bins", "d", "beta", "T"]
+FIELDS = ["allocation_strat", "balls", "bins", "choices", "beta", "repetitions"]
 
 
 class AllocationStrategy(Enum):
@@ -17,6 +17,6 @@ class Trial(namedtuple("Trial", field_names=FIELDS, defaults=(None,) * len(FIELD
     allocation_strat: AllocationStrategy | None
     balls: int | None
     bins: int | None
-    d: float | None
+    choices: float | None
     beta: float | None
-    T: int | None
+    repetitions: int | None
