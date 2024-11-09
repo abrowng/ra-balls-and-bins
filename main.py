@@ -4,8 +4,10 @@ from plotter import BinsPlotter, GapPlotter
 
 from models import *
 
+PLOT_SAMPLE = False
+
 TRIALS = [
-    Trial(allocation_strat=AllocationStrategy.B_BATCHED, balls=100, bins=100, choices=1, repetitions=10, batch_size=10),
+    Trial(allocation_strat=AllocationStrategy.B_BATCHED, balls=500, bins=100, choices=1, repetitions=10, batch_size=100),
 ]
 
 if __name__ == "__main__":
@@ -29,14 +31,19 @@ if __name__ == "__main__":
                 batch_size=trial.batch_size,
             )
 
-            if j == 0:
-                for batch in allocator.batch_initial_state:
-                    plotter = BinsPlotter(batch)
-                    plotter.create_plot(y_value=trial.balls / trial.bins, title="Initial State before batch allocation")
-                    plotter.show_plot()
-                for batch in allocator.batch_outputs:
-                    plotter = BinsPlotter(batch)
-                    plotter.create_plot(y_value=trial.balls / trial.bins, title="Final State after batch allocation")
+            if j == 0 and PLOT_SAMPLE:
+                if trial.allocation_strat == AllocationStrategy.B_BATCHED:
+                    for batch in allocator.batch_initial_state:
+                        plotter = BinsPlotter(batch)
+                        plotter.create_plot(y_value=trial.balls / trial.bins, title="Initial State before batch allocation")
+                        plotter.show_plot()
+                    for batch in allocator.batch_outputs:
+                        plotter = BinsPlotter(batch)
+                        plotter.create_plot(y_value=trial.balls / trial.bins, title="Final State after batch allocation")
+                        plotter.show_plot()
+                else:
+                    plotter = BinsPlotter(bins)
+                    plotter.create_plot(y_value=trial.balls / trial.bins)
                     plotter.show_plot()
 
             calc = GapCalculator(bins, trial.bins, trial.balls)
