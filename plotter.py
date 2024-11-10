@@ -31,7 +31,7 @@ class GapPlotter:
         self.gaps = gaps
         self.fig, self.ax = plt.subplots()
 
-    def plot_results(self):
+    def plot_results(self, title="Gap distribution"):
         counter = Counter(self.gaps)
         counts = list(counter.values())
         x = list(counter.keys())
@@ -41,10 +41,27 @@ class GapPlotter:
             counts,
             label="Bins Gap Results",
         )
+        self.ax.set_title(title)
         self.ax.set_xlabel("Gap")
         self.ax.set_ylabel("Observations")
         self.ax.legend()
 
     @staticmethod
     def show_plot():
+        plt.show()
+
+
+class MeanGapPlotter:
+
+    def __init__(self):
+        self.fig, self.ax = plt.subplots()
+        self.ax.set_xlabel("Number of Balls")
+        self.ax.set_ylabel("Mean Gap")
+
+    def add_results(self, num_balls, mean_gaps, label="Mean Gap", color="r"):
+        self.ax.plot(num_balls, mean_gaps, label=label, color=color)
+
+    def show_plot(self, title="Mean Gap vs Number of Balls"):
+        self.ax.set_title(title)
+        self.ax.legend()
         plt.show()
