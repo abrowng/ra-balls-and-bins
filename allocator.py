@@ -1,7 +1,8 @@
-import copy
 import random
 
-from models import Ball, AllocationStrategy
+import numpy as np
+
+from models import AllocationStrategy
 
 
 class Allocator:
@@ -25,9 +26,10 @@ class Allocator:
                 self.allocate_beta_choice(beta)
         elif allocation_strategy == AllocationStrategy.B_BATCHED:
             b = kwargs.get("batch_size", 1)
-            for _ in range(0, self.num_balls, b):
-                initial_bins_state = copy.deepcopy(self.bins)
-                for _ in range(b):
+            for i, start in enumerate(range(0, self.num_balls, b)):
+                initial_bins_state = [_b.size() for _b in self.bins]
+                end = min(start + b, self.num_balls)
+                for _ in range(start, end):
                     self.allocate_b_batched(initial_bins_state, **kwargs)
 
                 # TODO: Remove these batch copies, only used for plotting intermediate states.
@@ -40,22 +42,23 @@ class Allocator:
         return random.choices(self.bins, k=d)
 
     def allocate_standard(self, d=None, **kwargs):
-        random.choice(self.sample_bins()).add(Ball())
+        random.choice(self.sample_bins()).add(1)
 
     def allocate_emptiest(self, **kwargs):
         sampled_bins = self.sample_bins()
         min_size = min(sampled_bins, key=lambda b: b.size())
         emptiest_bins = [b for b in sampled_bins if b.size() == min_size.size()]
-        random.choice(emptiest_bins).add(Ball())
+        random.choice(emptiest_bins).add(1)
 
     def allocate_b_batched(self, initial_state, d=None, **kwargs):
         if d is None:
             d = self.d
         sampled_bins_indices = [random.randint(0, len(self.bins)-1) for _ in range(d)]
-        min_size_index = min(sampled_bins_indices, key=lambda i: initial_state[i].size())
-        emptiest_bins_indices = [i for i in sampled_bins_indices if initial_state[i].size() == initial_state[min_size_index].size()]
+        min_size_index = min(sampled_bins_indices, key=lambda i: initial_state[i])
+        emptiest_bins_indices = [i for i in sampled_bins_indices if initial_state[i] == initial_state[min_size_index]]
         emptiest_bins = [self.bins[i] for i in emptiest_bins_indices]
-        random.choice(emptiest_bins).add(Ball())
+        bin = random.choice(emptiest_bins)
+        bin.add(1)
 
     def allocate_beta_choice(self, beta):
         if not 0 <= beta <= 1:

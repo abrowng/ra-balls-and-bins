@@ -11,3 +11,6 @@ class Bin:
 
     def size(self):
         return self.contents.size
+
+    def empty(self):
+        self.contents = np.array([])
