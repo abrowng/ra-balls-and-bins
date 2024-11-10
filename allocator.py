@@ -97,7 +97,7 @@ class Allocator:
 
         if len(smaller_or_equal_bins) == 1:
             return smaller_or_equal_bins
-        elif len(larger_bins) == 0 and len(smaller_or_equal_bins) > 1:
+        elif len(smaller_or_equal_bins) > 1:
             return self.k_partition([b for b in self.bins if b.size() <= median_size], smaller_or_equal_bins, k - 1)
         elif len(smaller_or_equal_bins) == 0 and len(larger_bins) > 1:
             return self.k_partition([b for b in self.bins if b.size() > median_size], larger_bins, k - 1)
