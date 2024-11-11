@@ -1,3 +1,5 @@
+import numpy as np
+
 from matplotlib import pyplot as plt
 
 from allocator import Allocator
@@ -152,25 +154,29 @@ if __name__ == "__main__":
     else:
         d_values = [2, 3, 4, 5]
         beta_values = [0.8]
-        k_medians = [1, 2, 3]
+        k_medians = [1]
 
         plotter = MeanGapPlotter()
         main_colors = ['Greens', 'Reds', 'Purples', 'Blues', 'Grays', 'Oranges']
+
+        ### Uncomment the following to run the batched trials for different values of d, beta, and batch_size
         # for i, beta in enumerate(beta_values):
         #     plot_colors = get_single_hue_colors(main_colors[-i], 9)
         #     for results in run_batched_trials(beta=beta, d=2):
         #         plotter.add_results(results[1], results[0], label=f"Beta: {beta}, Batch Size: {results[2]}",
         #                             color=plot_colors.pop())
 
+        ### Uncomment the following to run the d-choice trials for different values of d
         # for i, d in enumerate(d_values):
         #     plot_colors = get_single_hue_colors(main_colors[i], 9)
         #     for results in run_batched_trials(d=d, strat=AllocationStrategy.D_CHOICE):
         #         plotter.add_results(results[1], results[0], label=f"d={d}",
         #                             color=plot_colors.pop())
 
+        ### Uncomment the following to run the k-means trials for different values of k
         for i, k in enumerate(k_medians):
             plot_colors = get_single_hue_colors(main_colors[i], 9)
-            for results in run_batched_trials(d=2, strat=AllocationStrategy.K_MEDIAN, k=k):
+            for results in run_batched_trials(strat=AllocationStrategy.K_MEDIAN, k=k):
                 plotter.add_results(results[1], results[0], label=f"d={results[2]}, k={k}",
                                     color=plot_colors.pop())
         plotter.show_plot(title=f"Mean Gap vs Number of Balls")

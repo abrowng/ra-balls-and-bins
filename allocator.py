@@ -1,6 +1,5 @@
+import bisect
 import random
-
-import numpy as np
 
 from models import AllocationStrategy
 
@@ -82,28 +81,40 @@ class Allocator:
         if k == 0:
             return sampled_bins
 
-        bin_sizes = np.array([b.size() for b in bins])
-        median_size = np.median(bin_sizes)
-
+        median_size = sorted_median(bins)
         smaller_or_equal_bins = []
         larger_bins = []
-        new_sampled_bins = []
         for bin in sampled_bins:
             if bin.size() <= median_size:
                 smaller_or_equal_bins.append(bin)
-                new_sampled_bins.append(bin)
             else:
                 larger_bins.append(bin)
 
+        median_idx = median_index(bins)
         if len(smaller_or_equal_bins) == 1:
             return smaller_or_equal_bins
         elif len(smaller_or_equal_bins) > 1:
-            return self.k_partition([b for b in self.bins if b.size() <= median_size], smaller_or_equal_bins, k - 1)
+            return self.k_partition(bins[:median_idx], smaller_or_equal_bins, k - 1)
         elif len(smaller_or_equal_bins) == 0 and len(larger_bins) > 1:
-            return self.k_partition([b for b in self.bins if b.size() > median_size], larger_bins, k - 1)
+            return self.k_partition(bins[median_idx:], larger_bins, k - 1)
 
     def allocate_k_median(self, d=None, k=1, **kwargs):
         if d is None:
             d = self.d
         bins_to_choose_from = self.k_partition(self.bins, self.sample_bins(d=d), k)
-        random.choice(bins_to_choose_from).add(1)
+        chosen_bin = random.choice(bins_to_choose_from)
+        chosen_bin.add(1)
+        bisect.insort(self.bins, chosen_bin)
+
+
+def sorted_median(arr):
+    n = len(arr)
+    if n % 2 == 0:
+        return 0.5 * (arr[n//2 - 1].size() + arr[n//2].size())
+    else:
+        return arr[n//2].size()
+
+
+def median_index(arr):
+    n = len(arr)
+    return n // 2 if n % 2 == 0 else n // 2 + 1

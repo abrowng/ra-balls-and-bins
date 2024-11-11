@@ -1,16 +1,14 @@
-import numpy as np
-
 
 class Bin:
     def __init__(self, name: str):
         self.name = name
-        self.contents = np.array([])
+        self._size = 0
 
-    def add(self, item):
-        self.contents = np.append(self.contents, item)
+    def add(self, count):
+        self._size += count
 
     def size(self):
-        return self.contents.size
+        return self._size
 
-    def empty(self):
-        self.contents = np.array([])
+    def __lt__(self, other):
+        return self.size() < other.size()
