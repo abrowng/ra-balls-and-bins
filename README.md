@@ -45,3 +45,7 @@ TRIALS = [
     Trial(allocation_strat=AllocationStrategy.K_MEDIAN, balls=3000, bins=100, choices=4, repetitions=100, k_median=2),
 ]
 ```
+
+Alternatively, by changing the `STD_TRIALS` to false, you can configure in the entrypoint a set of trials with
+varying `b`, `d`, `beta` and `k` to run for different values of `n` going from a light-loaded scenario of `n=m`
+to a heavy-loaded scenario of `n=m^2`. In this case, the output is a plot showing the behavior of the mean gap as `n` grows.
